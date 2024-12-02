@@ -1,0 +1,17 @@
+#contains hp
+dataset:
+  rootdir: D:\DATA\APPLE\Roboflow\
+
+nework:
+  backbone:
+    type: resent18
+    pretrained: True
+
+sampler:
+  batch_size: 4
+
+optimizer:
+  type: adam
+  kwargs:
+    beta1: 0.9
+    beta2: 0.999

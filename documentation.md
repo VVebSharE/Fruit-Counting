@@ -11,3 +11,6 @@
     - approach 3: doing object detection on the number of fruits
         app
 - step 3: list important models.
+
+
+#writing all script in pytroch lightning
