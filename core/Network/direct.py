@@ -229,7 +229,7 @@ class CountModel_cls(CountModel_reg):
     def loss(self, output, label):
         count = label["count"]
 
-        return F.cross_entropy(output, count, weight=self.count_freq)
+        return F.cross_entropy(output, count)
 
     def predict(self, x):
         return torch.argmax(self(x), dim=1)
