@@ -175,9 +175,9 @@ class CountModel_reg(L.LightningModule):
 
 
 class CountModel_cls(CountModel_reg):
-    def __init__(self, backbone: Backbone = Backbone.RESNET18):
+    def __init__(self, backbone: Backbone = Backbone.RESNET18, max_count=28):
         super().__init__(backbone)
-        self.max_count = 28
+        self.max_count = max_count
         # self.model.fc = torch.nn.Linear(self.model.fc.in_features, self.max_count)
         if backbone == Backbone.VIT or backbone == Backbone.SWIN:
             self.model.heads = torch.nn.Linear(
@@ -188,40 +188,6 @@ class CountModel_cls(CountModel_reg):
 
         # add a softmax layer to output probabilities
         self.softmax = torch.nn.Softmax(dim=1)
-
-        self.count_freq = {
-            3: 0.12296564195298372,
-            7: 0.039783001808318265,
-            12: 0.018083182640144666,
-            2: 0.14285714285714285,
-            5: 0.054249547920433995,
-            17: 0.0054249547920434,
-            14: 0.003616636528028933,
-            4: 0.081374321880651,
-            1: 0.36347197106690776,
-            22: 0.0018083182640144665,
-            6: 0.048824593128390596,
-            10: 0.023508137432188065,
-            8: 0.0325497287522604,
-            15: 0.0054249547920434,
-            9: 0.019891500904159132,
-            18: 0.007233273056057866,
-            11: 0.014466546112115732,
-            13: 0.007233273056057866,
-            20: 0.0018083182640144665,
-            26: 0.0018083182640144665,
-            16: 0.0018083182640144665,
-            23: 0.0018083182640144665,
-        }
-
-        for i in range(self.max_count):
-            if i not in self.count_freq:
-                self.count_freq[i] = 0.0018083182640144665
-
-        self.count_freq = [1 / self.count_freq[i] for i in range(self.max_count)]
-        self.count_freq = torch.tensor(self.count_freq)
-        self.count_freq = self.count_freq / torch.sum(self.count_freq)
-        self.count_freq = self.count_freq.float().cuda()
 
     def forward(self, x):
         return self.model(x)

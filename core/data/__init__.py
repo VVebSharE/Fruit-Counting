@@ -4,7 +4,7 @@ from .dataset2 import count_MinneApple, _collate_fn as _collate_fn2
 from torch.utils.data import DataLoader
 import os
 import lightning as L
-
+from core.data.dataset import Modality
 
 apple_roboflow_kwargs_train = {
     "root": "D:/DATA/APPLE/Roboflow/train",
@@ -33,19 +33,20 @@ def which_dataset(dataset):
         raise ValueError("Invalid dataset name")
 
 class AppleDataModule(L.LightningDataModule):
-    def __init__(self, dataset: str = "apple_roboflow"):
+    def __init__(self, dataset: str = "apple_roboflow", modality:Modality = Modality.RGB):
         super().__init__()
         self.transform = transforms.Compose(
             [
+                transforms.ToTensor(),
                 transforms.Resize(
                     (224, 224)
                 ),
                 transforms.RandomHorizontalFlip(),
                 transforms.RandomVerticalFlip(),
-                transforms.ToTensor(),
             ]
         )
 
+        self.modality = modality
         self.dataset = dataset
         self.dataset_class, self.collate_fn, self.train_kwargs, self.valid_kwargs = which_dataset(dataset)
 
@@ -60,11 +61,13 @@ class AppleDataModule(L.LightningDataModule):
             self.train_dataset = self.dataset_class(
                 **self.train_kwargs,
                 transform=self.transform,
+                modality=self.modality
             )
 
             self.valid_dataset = self.dataset_class(
                 **self.valid_kwargs,
                 transform=self.transform,
+                modality=self.modality
             )
 
         # Assign test dataset for use in dataloader(s)
@@ -72,12 +75,14 @@ class AppleDataModule(L.LightningDataModule):
             self.test_dataset = self.dataset_class(
                 **self.valid_kwargs,
                 transform=self.transform,
+                modality=self.modality
             )
 
         if stage == 'predict':
             self.predict_dataset = self.dataset_class(
                 **self.valid_kwargs,
                 transform=self.transform,
+                modality=self.modality
             )
 
     def train_dataloader(self):

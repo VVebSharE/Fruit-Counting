@@ -26,13 +26,14 @@ import torch
 from torch.utils.data import Dataset
 from torchvision import transforms
 from PIL import Image
-
+from core.data.dataset import convert_modality, Modality
 
 class count_MinneApple(Dataset):
-    def __init__(self, root_dir, split = 'train', transform = None):
+    def __init__(self, root_dir, split = 'train', transform = None, modality = Modality.RGB):
         self.root_dir = root_dir
         self.transform = transform
         self.split = split
+        self.modality = modality
 
         self.image_dir = os.path.join(self.root_dir, self.split, 'images')
         self.gt_file = os.path.join(self.root_dir, self.split, self.split + '_ground_truth.txt')
@@ -57,6 +58,9 @@ class count_MinneApple(Dataset):
         image_path = os.path.join(self.image_dir, image_name)
         image = Image.open(image_path).convert('RGB')
         count = self.gt[image_name]
+
+        image = convert_modality(image, self.modality)
+
         if self.transform:
             image = self.transform(image)
     
@@ -96,7 +100,6 @@ def _collate_fn(batch):
     labels["count"] = torch.tensor(labels["count"])
 
     return images, labels
-
 
 
 if __name__ == "__main__":
